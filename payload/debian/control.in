@@ -1,0 +1,17 @@
+Package: meo-3
+Version: @VERSION@
+Architecture: @DEB_ARCH@
+Maintainer: @MAINTAINER@
+Section: misc
+Priority: optional
+Homepage: https://github.com/thingai/meo-3
+Depends: libc6 (>= 2.34), libgcc-s1, adduser, systemd, mosquitto, npm, nodejs (>= 22.9), openjdk-@JAVA_REQ@-jre-headless | java@JAVA_REQ@-runtime-headless
+Description: MEO 3 gateway (Make Everything Online)
+ Local-first IoT platform for STEAM education. Installs the MEO gateway
+ service, the BLE provisioning service, and the MEO build of Node-RED, and
+ runs all three under systemd.
+ .
+ Node.js 22.9 or newer is required; Debian and Raspberry Pi OS stable ship an
+ older version, so add the NodeSource repository before installing. The Java
+ dependency matches the JDK the service was built with; Debian 12 and Raspberry
+ Pi OS Bookworm only offer openjdk-17.

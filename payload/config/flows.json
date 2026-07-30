@@ -1,0 +1,26 @@
+[
+    {
+        "id": "meo-tab-start",
+        "type": "tab",
+        "label": "Start here",
+        "disabled": false,
+        "info": "# Welcome to MEO 3\n\nThe gateway is already configured. To see a device:\n\n1. Power on a MEO device and provision it over Bluetooth.\n2. Drag a **meo event** node onto the canvas.\n3. Pick the gateway, then pick your device and what to listen for.\n4. Wire it to a **debug** node and press Deploy.\n\nTo control a device, use a **meo command** node instead."
+    },
+    {
+        "id": "meo-gateway-local",
+        "type": "meo-gateway",
+        "name": "MEO Gateway",
+        "host": "localhost",
+        "port": 7070
+    },
+    {
+        "id": "meo-note-start",
+        "type": "comment",
+        "z": "meo-tab-start",
+        "name": "Add a 'meo event' node here, wire it to a debug node, then Deploy",
+        "info": "The gateway config node is already set to localhost:7070.\nA meo event node needs a device, so it cannot be pre-wired for you.",
+        "x": 300,
+        "y": 120,
+        "wires": []
+    }
+]

@@ -1,0 +1,3 @@
+/etc/meo-3/meo.env
+/etc/meo-3/settings.js
+/etc/mosquitto/conf.d/meo-3.conf

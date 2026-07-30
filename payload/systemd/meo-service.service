@@ -1,0 +1,28 @@
+[Unit]
+Description=MEO 3 gateway service (device registry + provisioning API)
+Documentation=https://github.com/thingai/meo-3
+After=network-online.target mosquitto.service meo-ble.service
+Wants=network-online.target mosquitto.service
+PartOf=meo-3.target
+
+[Service]
+Type=simple
+User=meo
+Group=meo
+EnvironmentFile=/etc/meo-3/meo.env
+WorkingDirectory=/var/lib/meo-3
+ExecStart=/opt/meo-3/service/bin/meo-open-service
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+# meo.db and service state only.
+ReadWritePaths=/var/lib/meo-3
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

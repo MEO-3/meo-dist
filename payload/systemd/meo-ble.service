@@ -1,0 +1,21 @@
+[Unit]
+Description=MEO 3 BLE provisioning service (blemqtt)
+Documentation=https://github.com/thingai/meo-3
+# Owns BlueZ and publishes blemqtt over MQTT, so both must be up first.
+After=bluetooth.service mosquitto.service
+Wants=bluetooth.service mosquitto.service
+PartOf=meo-3.target
+
+[Service]
+Type=simple
+# Runs as root: BlueZ's D-Bus policy grants adapter control to root, and a
+# dedicated user would need a polkit rule per gateway image.
+User=root
+ExecStart=/opt/meo-3/ble/meo-3-neo-ble-service
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

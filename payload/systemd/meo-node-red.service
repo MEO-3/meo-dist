@@ -1,0 +1,32 @@
+[Unit]
+Description=MEO 3 Node-RED (visual automation editor)
+Documentation=https://github.com/thingai/meo-3
+# The MEO nodes talk to the service API and the broker; start after both.
+After=network-online.target mosquitto.service meo-service.service
+Wants=network-online.target mosquitto.service meo-service.service
+PartOf=meo-3.target
+
+[Service]
+Type=simple
+User=meo
+Group=meo
+Environment=NODE_ENV=production
+WorkingDirectory=/var/lib/meo-3/node-red
+ExecStart=/usr/bin/env node /opt/meo-3/node-red/node_modules/node-red/red.js \
+    -s /etc/meo-3/settings.js -u /var/lib/meo-3/node-red
+Restart=on-failure
+RestartSec=5
+# Node-RED installs nodes and rewrites flows on deploy; give it time to settle.
+KillSignal=SIGINT
+TimeoutStopSec=20
+StandardOutput=journal
+StandardError=journal
+
+ReadWritePaths=/var/lib/meo-3
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

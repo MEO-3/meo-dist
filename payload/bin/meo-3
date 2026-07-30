@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+# Control the three MEO 3 gateway services.
+#
+# Under systemd this drives the units. Extracted-and-run-in-place (no systemd,
+# no root) it launches the processes directly and tracks them in run/.
+set -euo pipefail
+
+UNITS=(meo-ble.service meo-service.service meo-node-red.service)
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+RUN="$HERE/run"
+
+use_systemd() {
+    command -v systemctl >/dev/null 2>&1 \
+        && systemctl list-unit-files meo-service.service >/dev/null 2>&1 \
+        && systemctl cat meo-service.service >/dev/null 2>&1
+}
+
+usage() { echo "usage: meo-3 {start|stop|restart|status|logs}"; exit 1; }
+
+# --- direct (no systemd) ----------------------------------------------------
+conf() { echo "${MEO_CONF_DIR:-$HERE/config}"; }
+
+direct_start() {
+    mkdir -p "$RUN" "$HERE/data/node-red"
+    set -a; . "$(conf)/meo.env"; set +a
+    : "${MEO_DATA_DIR:=$HERE/data}"; export MEO_DATA_DIR
+
+    _spawn ble  "$HERE/ble/meo-3-neo-ble-service"
+    _spawn service "$HERE/service/bin/meo-open-service"
+    _spawn node-red node "$HERE/node-red/node_modules/node-red/red.js" \
+        -s "$(conf)/settings.js" -u "$HERE/data/node-red"
+    echo "started (logs in $RUN)"
+}
+
+_spawn() {
+    local name="$1"; shift
+    if [ -f "$RUN/$name.pid" ] && kill -0 "$(cat "$RUN/$name.pid")" 2>/dev/null; then
+        echo "$name already running"; return
+    fi
+    "$@" >> "$RUN/$name.log" 2>&1 &
+    echo $! > "$RUN/$name.pid"
+    echo "$name started (pid $!)"
+}
+
+direct_stop() {
+    for name in node-red service ble; do
+        local pf="$RUN/$name.pid"
+        [ -f "$pf" ] || continue
+        local pid; pid="$(cat "$pf")"
+        if kill -0 "$pid" 2>/dev/null; then
+            kill "$pid" && echo "$name stopped"
+        fi
+        rm -f "$pf"
+    done
+}
+
+direct_status() {
+    for name in ble service node-red; do
+        local pf="$RUN/$name.pid"
+        if [ -f "$pf" ] && kill -0 "$(cat "$pf")" 2>/dev/null; then
+            echo "$name: running (pid $(cat "$pf"))"
+        else
+            echo "$name: stopped"
+        fi
+    done
+}
+
+# --- dispatch ---------------------------------------------------------------
+cmd="${1:-}"
+if use_systemd; then
+    case "$cmd" in
+        start|stop|restart) sudo systemctl "$cmd" "${UNITS[@]}" ;;
+        status)             systemctl --no-pager status "${UNITS[@]}" ;;
+        logs)               journalctl -f -u meo-ble -u meo-service -u meo-node-red ;;
+        *) usage ;;
+    esac
+else
+    case "$cmd" in
+        start)   direct_start ;;
+        stop)    direct_stop ;;
+        restart) direct_stop; direct_start ;;
+        status)  direct_status ;;
+        logs)    tail -f "$RUN"/*.log ;;
+        *) usage ;;
+    esac
+fi

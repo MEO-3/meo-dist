@@ -1,0 +1,12 @@
+#!/bin/sh
+# meo-3 prerm: stop the services before files go away.
+set -e
+
+case "$1" in
+remove|deconfigure|upgrade)
+    deb-systemd-invoke stop meo-node-red.service meo-service.service meo-ble.service || true
+    ;;
+failed-upgrade) ;;
+esac
+
+exit 0
