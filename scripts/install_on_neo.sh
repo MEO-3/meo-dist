@@ -69,8 +69,10 @@ fi
 # -- resolve version ----------------------------------------------------------
 if [ -z "$VERSION" ]; then
     info "Resolving latest release..."
+    # One sed that reads to EOF: an early-exiting consumer (grep -m1, head -1)
+    # gives curl EPIPE mid-body, and pipefail turns that into "curl: (23)".
     VERSION="$(curl -sSL "https://api.github.com/repos/${REPO}/releases/latest" \
-        | grep -m1 '"tag_name"' | sed -E 's/.*"v?([^"]+)".*/\1/')"
+        | sed -n 's/.*"tag_name": *"v\{0,1\}\([^"]*\)".*/\1/p')" || true
     [ -n "$VERSION" ] || { error "Could not resolve the latest release; pin one with --version=X.Y.Z"; exit 1; }
 fi
 
