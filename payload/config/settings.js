@@ -43,8 +43,8 @@ module.exports = {
             ...(BRANDING && { favicon: path.join(BRANDING, "meo-3-logo.png") })
         },
         header: {
-            title: "MEO 3",
-            ...(BRANDING && { image: path.join(BRANDING, "meo-3-logo_compact.png") })
+            // Text only — no image key, so the editor renders just the title.
+            title: "MEO 3"
         },
         projects: {
             // Classroom gateways don't want the git-projects workflow.
