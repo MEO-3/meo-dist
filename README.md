@@ -41,6 +41,21 @@ meo-3/
 
 ## Install on a gateway
 
+On a NEO One / Nano Pi / Raspberry Pi, one command installs the latest release:
+
+```bash
+curl -sSL https://raw.githubusercontent.com/MEO-3/meo-3-dist/main/scripts/install_on_neo.sh | bash
+```
+
+`scripts/install_on_neo.sh` resolves the latest release, downloads the .deb for
+the host architecture, and installs it. It also adds the NodeSource repository
+when the host's Node.js is older than 22 — the .deb's `nodejs (>= 22.9)`
+dependency is unsatisfiable on stock Armbian and Raspberry Pi OS otherwise.
+`--version=X.Y.Z` pins a release; `--uninstall` (or `--purge`) reverses it. The
+JRE dependency it cannot solve: see the Debian package section.
+
+From a downloaded tarball instead:
+
 ```bash
 tar -xzf meo-3-<version>-linux-arm64.tar.gz
 sudo meo-3/bin/install.sh
