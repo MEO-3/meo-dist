@@ -109,7 +109,9 @@ chown -R "$SVC_USER":"$SVC_USER" "$DATA"
 if [ -d /etc/mosquitto/conf.d ]; then
     info "installing mosquitto config"
     cp -a "$CONF/mosquitto-meo.conf" /etc/mosquitto/conf.d/meo-3.conf
-    systemctl restart mosquitto || true
+    # Never swallow this: without the broker nothing MEO does works.
+    systemctl restart mosquitto \
+        || echo "warning: mosquitto failed to start — the gateway has no MQTT broker. Run: systemctl status mosquitto" >&2
 else
     echo "warning: /etc/mosquitto/conf.d not found — configure the broker manually" >&2
 fi

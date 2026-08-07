@@ -27,8 +27,11 @@ configure)
     printf '{\n  "name": "meo-3-node-red",\n  "private": true\n}\n' > package.json
     npm install --omit=dev --no-audit --no-fund ./modules/*.tgz
 
+    # Never swallow this: without the broker nothing MEO does works, and a silent
+    # failure here shipped a gateway that looked installed but could not talk.
     if [ -d /etc/mosquitto/conf.d ]; then
-        deb-systemd-invoke restart mosquitto.service || true
+        deb-systemd-invoke restart mosquitto.service \
+            || echo "WARNING: mosquitto failed to start — the gateway has no MQTT broker. Run: systemctl status mosquitto" >&2
     fi
 
     systemctl daemon-reload || true
