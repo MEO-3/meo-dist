@@ -6,7 +6,7 @@
 VERSION  := $(shell cat VERSION)
 ARCH     ?= $(shell uname -m | sed 's/^x86_64$$/x86_64/; s/^aarch64$$/arm64/')
 
-SERVICE_DIR  ?= ../meo-3-open-service
+SERVICE_DIR  ?= ../meo-edge
 NODERED_DIR  ?= ../node-red-meo
 
 STAGE := build/stage

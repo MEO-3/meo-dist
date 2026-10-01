@@ -24,18 +24,18 @@ rm -rf "$ROOT"
 mkdir -p "$ROOT"/{bin,service,node-red/modules,ble,config,systemd,data}
 
 # --- Java service (installDist output: bin/ launcher + lib/*.jar) -----------
-JAVA_DIST="$SERVICE_DIR/build/install/meo-open-service"
+JAVA_DIST="$SERVICE_DIR/build/install/meo-edge"
 [ -d "$JAVA_DIST" ] || die "Java service not staged. Missing: $JAVA_DIST
 Build it first: make -C $SERVICE_DIR build"
 cp -a "$JAVA_DIST/." "$ROOT/service/"
 rm -f "$ROOT"/service/bin/*.bat   # gateways are Linux-only
 
 # --- Rust BLE binary, arch-matched -----------------------------------------
-BLE_DIR="$SERVICE_DIR/rust/meo-3-neo-ble-service"
+BLE_DIR="$SERVICE_DIR/rust/meo-helper"
 BLE_BIN=""
 for c in "${BLE_CANDIDATES[@]}"; do
-    if [ -f "$BLE_DIR/$c/meo-3-neo-ble-service" ]; then
-        BLE_BIN="$BLE_DIR/$c/meo-3-neo-ble-service"
+    if [ -f "$BLE_DIR/$c/meo-helper" ]; then
+        BLE_BIN="$BLE_DIR/$c/meo-helper"
         break
     fi
 done
@@ -43,12 +43,12 @@ if [ -z "$BLE_BIN" ]; then
     searched=""
     for c in "${BLE_CANDIDATES[@]}"; do
         searched="$searched
-  $BLE_DIR/$c/meo-3-neo-ble-service"
+  $BLE_DIR/$c/meo-helper"
     done
     die "BLE binary for $ARCH not found. Looked in:$searched
 Build it first: make -C $SERVICE_DIR ble-$([ "$ARCH" = arm64 ] && echo arm || echo x86)"
 fi
-install -m 0755 "$BLE_BIN" "$ROOT/ble/meo-3-neo-ble-service"
+install -m 0755 "$BLE_BIN" "$ROOT/ble/meo-helper"
 
 # Reject a host-built binary staged for the wrong architecture.
 case "$ARCH" in
@@ -56,8 +56,8 @@ case "$ARCH" in
     arm64)  want="aarch64" ;;
 esac
 if command -v file >/dev/null 2>&1; then
-    file -b "$ROOT/ble/meo-3-neo-ble-service" | grep -qi "$want" \
-        || die "BLE binary is not $want: $(file -b "$ROOT/ble/meo-3-neo-ble-service")"
+    file -b "$ROOT/ble/meo-helper" | grep -qi "$want" \
+        || die "BLE binary is not $want: $(file -b "$ROOT/ble/meo-helper")"
 fi
 
 # A host cargo build on a modern distro requires a glibc newer than the target
@@ -65,7 +65,7 @@ fi
 # that here rather than on a Raspberry Pi. GLIBC_FLOOR is Debian/Pi OS bookworm.
 GLIBC_FLOOR="${GLIBC_FLOOR:-2.36}"
 if command -v readelf >/dev/null 2>&1; then
-    needed="$(readelf -V "$ROOT/ble/meo-3-neo-ble-service" 2>/dev/null \
+    needed="$(readelf -V "$ROOT/ble/meo-helper" 2>/dev/null \
         | grep -o 'GLIBC_[0-9.]*' | sed 's/GLIBC_//' | sort -uV | tail -1)"
     if [ -n "$needed" ] \
        && [ "$(printf '%s\n%s\n' "$GLIBC_FLOOR" "$needed" | sort -V | tail -1)" != "$GLIBC_FLOOR" ]; then
@@ -94,7 +94,7 @@ chmod 0755 "$ROOT"/bin/*
 # The JRE the service actually needs depends on which JDK built it, so read it
 # out of the bytecode instead of assuming. Class major 65 = Java 21.
 JAVA_REQ=""
-main_jar="$(ls "$ROOT"/service/lib/meo-open-service-*.jar 2>/dev/null | head -1 || true)"
+main_jar="$(ls "$ROOT"/service/lib/meo-edge-*.jar 2>/dev/null | head -1 || true)"
 if [ -n "$main_jar" ] && command -v unzip >/dev/null 2>&1; then
     cls="$(unzip -Z1 "$main_jar" | grep -m1 '\.class$' || true)"
     if [ -n "$cls" ]; then

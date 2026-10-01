@@ -6,7 +6,7 @@
 #
 # Usage:
 #   Local:  bash scripts/install_on_neo.sh
-#   Remote: curl -sSL https://raw.githubusercontent.com/MEO-3/meo-3-dist/main/scripts/install_on_neo.sh | bash
+#   Remote: curl -sSL https://raw.githubusercontent.com/MEO-3/meo-dist/main/scripts/install_on_neo.sh | bash
 #
 # Options:
 #   --version=X.Y.Z   install a specific release (default: latest)
@@ -15,7 +15,7 @@
 # ==============================================================================
 set -euo pipefail
 
-REPO="MEO-3/meo-3-dist"
+REPO="MEO-3/meo-dist"
 PKG="meo-3"
 RAW_URL="https://raw.githubusercontent.com/${REPO}/main/scripts/install_on_neo.sh"
 

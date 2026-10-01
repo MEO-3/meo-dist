@@ -25,8 +25,8 @@ direct_start() {
     set -a; . "$(conf)/meo.env"; set +a
     : "${MEO_DATA_DIR:=$HERE/data}"; export MEO_DATA_DIR
 
-    _spawn ble  "$HERE/ble/meo-3-neo-ble-service"
-    _spawn service "$HERE/service/bin/meo-open-service"
+    _spawn ble  "$HERE/ble/meo-helper"
+    _spawn service "$HERE/service/bin/meo-edge"
     _spawn node-red node "$HERE/node-red/node_modules/node-red/red.js" \
         -s "$(conf)/settings.js" -u "$HERE/data/node-red"
     echo "started (logs in $RUN)"

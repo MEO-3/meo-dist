@@ -1,4 +1,4 @@
-# meo-3-dist
+# meo-dist
 
 Release packaging for the MEO 3 gateway. This repo holds **no product source** — it
 builds the sibling repos, stages their artifacts into one tree, and packages it.
@@ -7,8 +7,8 @@ Expected workspace layout:
 
 ```
 meo-3/
-├── meo-3-dist/          <- this repo
-├── meo-3-open-service/  Java service + Rust BLE service
+├── meo-dist/          <- this repo
+├── meo-edge/  Java service + Rust BLE service
 └── node-red-meo/        the MEO fork of Node-RED
 ```
 
@@ -33,7 +33,7 @@ meo-3/
 ├── bin/          meo-3 (start|stop|restart|status|logs), install.sh, uninstall.sh
 ├── service/      Java service: bin/ launcher + lib/*.jar
 ├── node-red/     modules/*.tgz  (node_modules/ appears at install time)
-├── ble/          meo-3-neo-ble-service (arch-matched)
+├── ble/          meo-helper (arch-matched)
 ├── config/       meo.env, settings.js, flows.json, mosquitto-meo.conf, branding/
 ├── systemd/      meo-ble, meo-service, meo-node-red
 └── data/         runtime home (meo.db, Node-RED userDir)
@@ -42,7 +42,7 @@ meo-3/
 ## Install on a gateway
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/MEO-3/meo-3-dist/main/scripts/install_on_neo.sh | bash
+curl -sSL https://raw.githubusercontent.com/MEO-3/meo-dist/main/scripts/install_on_neo.sh | bash
 ```
 
 `scripts/install_on_neo.sh` resolves the latest release and installs the .deb for
@@ -83,6 +83,6 @@ the three processes and logs to `meo-3/run/`.
   a glibc newer than the gateways have, and the binary then refuses to start. `make
   dist` uses `cross` for both arches, and `stage.sh` fails the build if a binary's
   glibc floor exceeds `GLIBC_FLOOR` (2.36, Bookworm).
-- **Firmware is not packaged.** `meo-3-arduino` ships to devices via PlatformIO.
+- **Firmware is not packaged.** `meo-arduino` ships to devices via PlatformIO.
 
 Cutting a release: see [RELEASE.md](RELEASE.md).
