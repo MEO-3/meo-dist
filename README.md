@@ -60,7 +60,7 @@ Without root or systemd the tree also runs in place: `meo-3/bin/meo-3 start` spa
 
 - **Install needs network**, running afterwards does not — Node-RED's dependencies are resolved at install time. Offline gateways need a baked-in `node_modules`.
 - **The JRE dependency is derived, not hardcoded.** `stage.sh` records the service's bytecode version in `BUILD_INFO` and `deb.sh` turns it into `Depends: openjdk-<n>-jre-headless`. A JDK-21 build therefore requires openjdk-21, which **Debian 12 / Raspberry Pi OS Bookworm do not ship at all**, not even in backports. Those gateways need a JDK-17 rebuild, Debian 13, or a third-party JDK.
-- **Broker must be on the gateway.** The Rust BLE service hardcodes `localhost:1883` and `meo-gateway` derives `mqtt://<host>:1883`; neither is configurable.
+- **Broker must be on the gateway.** The Rust BLE service hardcodes `localhost:1883` and the `meo-edge` node derives `mqtt://<host>:1883`; neither is configurable.
 - **BLE binaries must be cross-built.** A host `cargo build` on a modern distro links a glibc newer than the gateways have, and the binary then refuses to start. `make dist` uses `cross` for both arches, and `stage.sh` fails the build if a binary's glibc floor exceeds `GLIBC_FLOOR` (2.36, Bookworm).
 - **Firmware is not packaged.** `meo-arduino` ships to devices via PlatformIO.
 
