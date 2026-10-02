@@ -1,16 +1,12 @@
 # Release process
 
-How a MEO 3 release is cut. `<VERSION>` below is the version in `VERSION`
-(no `v` prefix); the git tag is `v<VERSION>`.
+How a MEO 3 release is cut. `<VERSION>` below is the version in `VERSION` (no `v` prefix); the git tag is `v<VERSION>`.
 
 ## 1. Prepare
 
-- [ ] `VERSION` holds the version being released. Artifact names come from it, so
-      it must match the tag: `VERSION` = `0.1.0` → tag `v0.1.0`.
-- [ ] Sibling repos are committed and pushed — the release is built from their
-      working trees, not from a tag, so anything uncommitted ships silently.
-- [ ] Build host has JDK 17–21 (`make build-service` refuses anything else),
-      Node.js >= 22.9, `cross`, and podman/docker.
+- [ ] `VERSION` holds the version being released. Artifact names come from it, so it must match the tag: `VERSION` = `0.1.0` → tag `v0.1.0`.
+- [ ] Sibling repos are committed and pushed — the release is built from their working trees, not from a tag, so anything uncommitted ships silently.
+- [ ] Build host has JDK 17–21 (`make build-service` refuses anything else), Node.js >= 22.9, `cross`, and podman/docker.
 
 ## 2. Build all four artifacts
 
@@ -34,13 +30,9 @@ Expected in `build/dist/`:
 
 ## 3. Verify before publishing
 
-- [ ] `cat build/stage/meo-3/BUILD_INFO` — version, arch, and `java_runtime` are
-      what you expect. `java_runtime` decides the deb's JRE dependency.
-- [ ] Both BLE binaries are the right arch and stay under the glibc floor
-      (`stage.sh` fails the build otherwise, but confirm it ran):
-      `readelf -V <binary> | grep -o 'GLIBC_[0-9.]*' | sort -uV | tail -1`
-- [ ] Install both debs on real hardware or in a clean container, confirm the
-      editor opens and a device appears, then `apt purge` and confirm it is clean.
+- [ ] `cat build/stage/meo-3/BUILD_INFO` — version, arch, and `java_runtime` are what you expect. `java_runtime` decides the deb's JRE dependency.
+- [ ] Both BLE binaries are the right arch and stay under the glibc floor (`stage.sh` fails the build otherwise, but confirm it ran): `readelf -V <binary> | grep -o 'GLIBC_[0-9.]*' | sort -uV | tail -1`
+- [ ] Install both debs on real hardware or in a clean container, confirm the editor opens and a device appears, then `apt purge` and confirm it is clean.
 
 ## 4. Tag and publish
 
@@ -52,8 +44,7 @@ gh release create v<VERSION> build/dist/* \
     --notes-file <(release notes, from the template below)
 ```
 
-Artifacts are attached to the GitHub release, not committed — `build/` is
-gitignored.
+Artifacts are attached to the GitHub release, not committed — `build/` is gitignored.
 
 ---
 
@@ -73,8 +64,7 @@ Copy from here down, fill the placeholders, drop what does not apply.
 - Watch live readings from sensors as they happen.
 - Build automations by dragging blocks: when this changes, do that.
 - Send commands to devices and see their replies.
-- Everything runs on your own hardware. No account, no cloud, works offline once
-  set up.
+- Everything runs on your own hardware. No account, no cloud, works offline once set up.
 
 <!-- For later releases, replace the list above with what is new this time. -->
 
@@ -104,11 +94,8 @@ Open `http://<address>:1880` and start building. Everything is preconfigured.
 
 ### Requirements
 
-- **Node.js >= 22.9** — Debian 12 and Raspberry Pi OS Bookworm ship older, so add
-  the NodeSource repository first:
-  `curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash - && sudo apt install nodejs`
-- **JRE \<N\>** — matches the JDK the service was built with; see `java_runtime` in
-  `BUILD_INFO`.
+- **Node.js >= 22.9** — Debian 12 and Raspberry Pi OS Bookworm ship older, so add the NodeSource repository first: `curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash - && sudo apt install nodejs`
+- **JRE \<N\>** — matches the JDK the service was built with; see `java_runtime` in `BUILD_INFO`.
 - **mosquitto**
 - **Network during install** — dependencies are resolved at install time.
 
